@@ -9,7 +9,7 @@ Markdown and standalone visual HTML guides.
 Use this skill when you need documentation that is accurate enough for technical
 review and clear enough for stakeholders who don't read raw Boomi XML.
 
-Current version: `1.0.0`
+Current version: `1.0.1`
 
 ## Relationship to Boomi Companion
 
@@ -117,6 +117,7 @@ pack, or project-level agent guide.
 | --- | --- | --- |
 | Codex | `~/.codex/skills/boomi-project-documenter` | Uses `SKILL.md` directly. |
 | Claude / Claude Code | Project-local skill or instructions directory | Use `SKILL.md` as the agent guide. |
+| GitHub Copilot | `.github/copilot-instructions.md` | Add repository instructions that tell Copilot to use `SKILL.md`, `references/`, and `scripts/` when documenting Boomi projects. |
 | OpenCode | Runtime-specific skills or instructions directory | Confirm the configured skills path. |
 | PI Coding Agent | Project instructions or agent skills directory | Use the full `boomi-project-documenter/` folder when supported. |
 | Antigravity | Project rules, agent instructions, or skills directory | Use `SKILL.md` as the primary instruction file. |
@@ -125,6 +126,22 @@ pack, or project-level agent guide.
 If your runtime does not support folder-based skills, copy the contents of
 `SKILL.md` into the runtime's project instructions and keep the `references/`
 and `scripts/` paths available to the agent.
+
+### GitHub Copilot
+
+To use this workflow with GitHub Copilot, add repository custom instructions in
+the target Boomi project:
+
+```text
+.github/copilot-instructions.md
+```
+
+In that file, tell Copilot to use this repository's `SKILL.md` as the primary
+workflow for Boomi project documentation and to consult `references/` and
+`scripts/` when generating or validating Markdown and standalone HTML reports.
+Keep a copy of this skill repository available in the workspace, or paste the
+contents of `SKILL.md` into the Copilot instructions file and preserve access to
+the reference templates and validator script.
 
 ## Versioning
 
@@ -139,7 +156,7 @@ This project uses Semantic Versioning:
   their invocation or generated-document expectations.
 
 The current release number is stored in `VERSION`, mirrored in `SKILL.md`, and
-published with Git tags such as `v1.0.0`.
+published with Git tags such as `v1.0.1`.
 
 ## Example prompt
 
