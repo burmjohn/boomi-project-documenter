@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>[Project Name] Boomi visual guide</title>
+  <style>
+    :root {
+      --ink: #182230;
+      --muted: #5b6573;
+      --page: #edf2f7;
+      --paper: #ffffff;
+      --line: #d8e1eb;
+      --nav: #101827;
+      --accent: #006d77;
+      --accent-soft: #e7f5f6;
+      --risk: #9a3412;
+      --risk-soft: #fff1e8;
+      --code: #eef4f8;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.58;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+    aside {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      padding: 28px 22px;
+      color: #f8fafc;
+      background: var(--nav);
+      border-right: 1px solid #0b1220;
+    }
+    .brand { padding-bottom: 18px; margin-bottom: 18px; border-bottom: 1px solid rgba(255,255,255,.16); }
+    .eyebrow { margin: 0 0 8px; color: #9bd4dc; font-size: 12px; font-weight: 750; letter-spacing: .08em; text-transform: uppercase; }
+    .brand-title { margin: 0; font-size: 20px; line-height: 1.2; }
+    .brand p { margin: 12px 0 0; color: #b8c2d6; font-size: 13px; }
+    nav a { display: block; padding: 8px 10px; color: #d8e1f2; text-decoration: none; border-radius: 6px; font-size: 13px; }
+    nav a:hover { color: #fff; background: rgba(255,255,255,.08); }
+    main { width: min(1120px, 100%); margin: 0 auto; padding: 42px 42px 72px; }
+    .hero { padding: 34px 0 26px; border-bottom: 1px solid var(--line); margin-bottom: 28px; }
+    .hero h1 { margin: 0; font-size: clamp(34px, 5vw, 60px); line-height: 1.02; letter-spacing: 0; }
+    .hero p { max-width: 850px; margin: 16px 0 0; color: var(--muted); font-size: 18px; }
+    .status-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+    .status { min-height: 104px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .status strong { display: block; font-size: 24px; line-height: 1.1; }
+    .status span { display: block; margin-top: 7px; color: var(--muted); font-size: 13px; }
+    .status.risk { background: var(--risk-soft); border-color: #f3c9b7; }
+    .content { background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 34px 40px; box-shadow: 0 18px 44px rgba(16,24,39,.08); }
+    h2 { margin: 42px 0 12px; padding-top: 8px; border-top: 1px solid var(--line); font-size: 25px; line-height: 1.25; }
+    h2:first-of-type { margin-top: 0; border-top: 0; padding-top: 0; }
+    h3 { margin: 28px 0 10px; font-size: 19px; }
+    p { margin: 0 0 15px; }
+    ul, ol { margin: 0 0 18px 24px; padding: 0; }
+    li { margin: 5px 0; padding-left: 2px; }
+    code { font-family: "SFMono-Regular", Consolas, "Liberation Mono", monospace; font-size: .92em; background: var(--code); color: #17324a; border: 1px solid #dce5ed; border-radius: 5px; padding: 1px 5px; }
+    .table-wrap { overflow-x: auto; margin: 18px 0 24px; }
+    table { width: 100%; border-collapse: collapse; min-width: 680px; font-size: 14px; }
+    th, td { border: 1px solid var(--line); padding: 10px 12px; text-align: left; vertical-align: top; }
+    th { background: #e9f2f4; color: #102a32; }
+    tr:nth-child(even) td { background: #fafbfd; }
+    .diagram { width: 100%; height: auto; margin: 18px 0 24px; border: 1px solid var(--line); border-radius: 8px; background: #fbfdff; }
+    @media (max-width: 900px) {
+      .layout { display: block; }
+      aside { position: static; height: auto; }
+      main { padding: 26px 18px 48px; }
+      .content { padding: 24px 20px; }
+      .status-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .hero h1 { font-size: 34px; }
+    }
+    @media (max-width: 560px) { .status-grid { grid-template-columns: 1fr; } }
+    @media print {
+      body { background: #fff; }
+      .layout { display: block; }
+      aside { display: none; }
+      main { max-width: none; padding: 0; }
+      .content, .status { box-shadow: none; }
+      .content { border: 0; padding: 0; }
+      a { color: inherit; }
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <aside>
+      <div class="brand">
+        <p class="eyebrow">Boomi project</p>
+        <p class="brand-title">[Project Name] visual guide</p>
+        <p>Standalone guide generated from current Markdown documentation and verified Boomi evidence.</p>
+      </div>
+      <nav aria-label="Document sections">
+        <a href="#top">Overview</a>
+        <a href="#baseline">Baseline</a>
+        <a href="#flow">End-to-end flow</a>
+        <a href="#routing">Routing model</a>
+        <a href="#external-systems">External systems</a>
+        <a href="#risks">Risks</a>
+        <a href="#next-steps">Next steps</a>
+      </nav>
+    </aside>
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-title">
+        <h1 id="hero-title">[Project Name] Boomi visual guide</h1>
+        <p>[One or two evidence-backed sentences describing the project purpose, current evidence date, and current status.]</p>
+        <div class="status-grid" aria-label="Current evidence status">
+          <div class="status"><strong>[Date]</strong><span>Current inventory or XML evidence checked.</span></div>
+          <div class="status"><strong>[Count]</strong><span>Component records in the evidence set.</span></div>
+          <div class="status"><strong>[Count]</strong><span>Changed components compared with the prior baseline.</span></div>
+          <div class="status risk"><strong>[Count]</strong><span>Open risks or unresolved dependencies.</span></div>
+        </div>
+      </section>
+
+      <article class="content">
+        <h2 id="baseline">Current Baseline</h2>
+        <p>Summarize the current inventory and the most important component versions. Keep counts tied to a named evidence file.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Type</th>
+                <th>Version</th>
+                <th>Evidence</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>[component]</code></td>
+                <td>[type]</td>
+                <td><code>[version]</code></td>
+                <td><code>[file or inventory row]</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="flow">End-to-End Flow</h2>
+        <p>Use a diagram only for real runtime behavior proven by process wiring.</p>
+        <svg class="diagram" viewBox="0 0 900 210" role="img" aria-labelledby="flow-title flow-desc">
+          <title id="flow-title">End-to-end Boomi flow</title>
+          <desc id="flow-desc">A generic source to transform to route to deliver to response handling flow.</desc>
+          <defs>
+            <marker id="arrow" markerWidth="10" markerHeight="10" refX="7" refY="3" orient="auto">
+              <path d="M0,0 L0,6 L8,3 z" fill="#006d77"></path>
+            </marker>
+          </defs>
+          <g fill="#e7f5f6" stroke="#006d77" stroke-width="2">
+            <rect x="30" y="70" width="130" height="70" rx="8"></rect>
+            <rect x="200" y="70" width="130" height="70" rx="8"></rect>
+            <rect x="370" y="70" width="130" height="70" rx="8"></rect>
+            <rect x="540" y="70" width="130" height="70" rx="8"></rect>
+            <rect x="710" y="70" width="150" height="70" rx="8"></rect>
+          </g>
+          <g fill="#182230" font-family="Inter, sans-serif" font-size="15" text-anchor="middle">
+            <text x="95" y="100">Source</text>
+            <text x="95" y="120">event or file</text>
+            <text x="265" y="100">Normalize</text>
+            <text x="265" y="120">and map</text>
+            <text x="435" y="100">Route</text>
+            <text x="435" y="120">decision</text>
+            <text x="605" y="100">Deliver</text>
+            <text x="605" y="120">payload</text>
+            <text x="785" y="100">Handle response</text>
+            <text x="785" y="120">and status</text>
+          </g>
+          <g stroke="#006d77" stroke-width="2.4" marker-end="url(#arrow)">
+            <line x1="160" y1="105" x2="196" y2="105"></line>
+            <line x1="330" y1="105" x2="366" y2="105"></line>
+            <line x1="500" y1="105" x2="536" y2="105"></line>
+            <line x1="670" y1="105" x2="706" y2="105"></line>
+          </g>
+        </svg>
+
+        <h2 id="routing">Routing Model</h2>
+        <p>Explain route keys, decision properties, cross-reference lookups, or branching rules only when current process wiring proves them.</p>
+
+        <h2 id="external-systems">External Systems</h2>
+        <p>List databases, APIs, queues, disks, mail services, or trading endpoints as generic system roles unless exact names are required and safe to disclose.</p>
+
+        <h2 id="risks">Risks and Verification Status</h2>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Area</th>
+                <th>Status</th>
+                <th>Evidence</th>
+                <th>Next check</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>[area]</td>
+                <td>[proven current, open risk, or historical only]</td>
+                <td><code>[evidence]</code></td>
+                <td>[testable next check]</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h2 id="next-steps">Next Steps</h2>
+        <ol>
+          <li>[Specific verification or implementation step.]</li>
+          <li>[Specific verification or implementation step.]</li>
+          <li>[Specific verification or implementation step.]</li>
+        </ol>
+      </article>
+    </main>
+  </div>
+</body>
+</html>
