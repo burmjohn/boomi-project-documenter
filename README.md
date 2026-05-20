@@ -94,10 +94,11 @@ The `scripts/` directory contains validation helpers:
 
 ## Installation
 
-Install the skill by copying the `boomi-project-documenter/` directory into the
-skills directory used by your AI agent runtime:
+Install the skill by copying this repository directory into the skills directory
+used by your AI agent runtime:
 
 ```bash
+git clone https://github.com/burmjohn/boomi-project-documenter.git
 cp -R boomi-project-documenter /path/to/agent-skills/
 ```
 
@@ -142,27 +143,27 @@ or zero dependency without direct evidence.
 Run the skill validator after editing the skill:
 
 ```bash
-python3 /path/to/skill-creator/scripts/quick_validate.py boomi-project-documenter
+python3 /path/to/skill-creator/scripts/quick_validate.py .
 ```
 
 Run the bundled HTML validator against the reference template:
 
 ```bash
-python3 boomi-project-documenter/scripts/validate_boomi_docs.py \
-  --html boomi-project-documenter/references/visual-html-guide-template.html
+python3 scripts/validate_boomi_docs.py \
+  --html references/visual-html-guide-template.html
 ```
 
 Run the bundled HTML validator against the generated sample report:
 
 ```bash
-python3 boomi-project-documenter/scripts/validate_boomi_docs.py \
-  --html boomi-project-documenter/references/sample-generated-visual-report.html
+python3 scripts/validate_boomi_docs.py \
+  --html references/sample-generated-visual-report.html
 ```
 
 Run the validator against generated documentation:
 
 ```bash
-python3 boomi-project-documenter/scripts/validate_boomi_docs.py \
+python3 scripts/validate_boomi_docs.py \
   --markdown path/to/main-documentation.md \
   --html path/to/visual-guide.html
 ```
