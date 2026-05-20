@@ -7,6 +7,8 @@ description: >-
   cross references, deployment or execution evidence, and existing docs to
   produce technical Markdown, supporting docs, standalone visual HTML guides,
   evidence notes, stale-claim scans, or completion reports for Boomi projects.
+metadata:
+  version: 1.0.0
 ---
 
 # Boomi Project Documenter

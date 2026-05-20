@@ -9,6 +9,8 @@ Markdown and standalone visual HTML guides.
 Use this skill when you need documentation that is accurate enough for technical
 review and clear enough for stakeholders who don't read raw Boomi XML.
 
+Current version: `1.0.0`
+
 ## Relationship to Boomi Companion
 
 This skill works alongside
@@ -56,6 +58,7 @@ boomi-project-documenter/
 ├── assets/
 │   └── sample-generated-visual-report.png
 ├── SKILL.md
+├── VERSION
 ├── references/
 │   ├── evidence-and-verification.md
 │   ├── example-prompts-and-reports.md
@@ -122,6 +125,21 @@ pack, or project-level agent guide.
 If your runtime does not support folder-based skills, copy the contents of
 `SKILL.md` into the runtime's project instructions and keep the `references/`
 and `scripts/` paths available to the agent.
+
+## Versioning
+
+This project uses Semantic Versioning:
+
+- Patch releases fix typos, validation bugs, examples, or wording without
+  changing the expected documentation workflow.
+- Minor releases add backward-compatible references, validators, examples, or
+  workflow guidance.
+- Major releases change the expected output contract, required evidence model,
+  file layout, or validator behavior in a way that may require users to update
+  their invocation or generated-document expectations.
+
+The current release number is stored in `VERSION`, mirrored in `SKILL.md`, and
+published with Git tags such as `v1.0.0`.
 
 ## Example prompt
 
@@ -192,7 +210,8 @@ Before publishing changes, run these checks:
 2. Run the bundled HTML validator on the visual reference template.
 3. Search the repository for organization names, process names, table names,
    internal endpoints, and internal paths.
-4. Run `git diff --check`.
+4. Confirm `VERSION`, `SKILL.md`, and the Git tag use the same release number.
+5. Run `git diff --check`.
 
 ## Contributing
 
