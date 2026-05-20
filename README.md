@@ -115,7 +115,7 @@ pack, or project-level agent guide.
 | Codex | `~/.codex/skills/boomi-project-documenter` | Uses `SKILL.md` directly. |
 | Claude / Claude Code | Project-local skill or instructions directory | Use `SKILL.md` as the agent guide. |
 | OpenCode | Runtime-specific skills or instructions directory | Confirm the configured skills path. |
-| Project Indigo / PI | Project instructions or agent skills directory | Use the full `boomi-project-documenter/` folder when supported. |
+| PI Coding Agent | Project instructions or agent skills directory | Use the full `boomi-project-documenter/` folder when supported. |
 | Antigravity | Project rules, agent instructions, or skills directory | Use `SKILL.md` as the primary instruction file. |
 | Cursor / Windsurf | Project rules or agent instructions | Use `SKILL.md` as the source instructions if native skills are unsupported. |
 
