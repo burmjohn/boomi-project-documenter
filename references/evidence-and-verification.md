@@ -7,7 +7,7 @@ Use this guide when gathering Boomi evidence, refreshing docs, or verifying clai
 Prefer current, local, inspectable evidence:
 
 1. Current Boomi component XML under the active development folder.
-2. Latest API inventory export.
+2. Current API inventory export.
 3. Previous baseline inventory export for diff counts.
 4. Sync-state records, pull logs, and promotion logs.
 5. Deployment records and execution logs.
@@ -98,6 +98,10 @@ rg -n \
 Verify:
 
 - The title and purpose match the documented project.
+- The high-level overview follows the canonical Documentation Levels taxonomy
+  and missing-evidence fallback rule from `SKILL.md`.
+- Audience, purpose, system boundary, status, and decisions are stated without
+  unsupported business or runtime claims.
 - Scope names the evidence basis and exclusions.
 - Inventory counts and component versions match the current evidence.
 - End-to-end flow follows current process wiring.

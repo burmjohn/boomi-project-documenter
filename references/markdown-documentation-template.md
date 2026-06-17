@@ -14,6 +14,30 @@ It explains the current evidence basis, the main runtime flow, supporting servic
 known risks, and recommended next steps.
 ```
 
+## High-Level Overview
+
+Use the canonical Documentation Levels taxonomy from `SKILL.md`. Start with a
+stakeholder-readable summary before detailed component tables, then name the
+audience levels and the use case each level can act on:
+
+```markdown
+## High-level overview
+
+`[Project Name]` supports `[business or operational capability]` by moving
+`[source document/event]` from `[source system role]` through Boomi to
+`[target system role]`.
+
+Current evidence shows `[proven current status]`. The main open questions are
+`[risk or dependency]`, `[runtime/deployment gap]`, and `[validation gap]`.
+
+| Documentation level | Use case for this project | Evidence basis |
+| --- | --- | --- |
+| `[level from SKILL.md]` | `[decision or task supported]` | `[evidence notes]` |
+```
+
+Keep the overview factual and apply the missing-evidence fallback rule from
+`SKILL.md`.
+
 ## Scope and Evidence Basis
 
 Include:
@@ -100,6 +124,8 @@ Key behavior:
 
 Recommended sections:
 
+- High-level overview.
+- System boundary and connected system roles.
 - Main entry process.
 - Core orchestration process.
 - Routing or decision model.
@@ -157,4 +183,4 @@ Avoid:
 - "The project is live" without deployment or execution evidence.
 - "No dependencies remain" without a current reference scan.
 - "Fully complete" without passing verification.
-- "Latest" without naming the exact inventory and date.
+- Relative date claims without naming the exact inventory and date.

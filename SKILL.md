@@ -25,12 +25,32 @@ Boomi-oriented development tooling, skills, and companion workflows. Use this
 skill when the task is specifically to document a Boomi project from local
 evidence.
 
+## Documentation Levels
+
+Build layered documentation, not just a component catalog. Treat this section as
+the canonical taxonomy for templates, examples, and verification checks:
+
+- Executive level: explain the integration purpose, business capability,
+  connected system roles, current status, and open decisions in plain language.
+- Operational level: explain triggers, runtime flow, dependencies, support
+  touchpoints, failure handling, and validation or deployment gaps.
+- Implementation level: preserve exact Boomi component names, IDs, versions,
+  connector operations, maps, profiles, properties, and cross references.
+- Evidence level: show which XML, inventories, logs, tests, and prior documents
+  support each claim, and label gaps clearly.
+
+The higher-level narrative must synthesize evidence; it must not invent business
+intent, ownership, production status, runtime activity, or readiness that the
+evidence does not prove. When purpose, business context, status, ownership, or
+open decisions are not established by evidence, say `not established from
+current evidence` instead of filling the gap.
+
 ## Workflow
 
 1. Establish the evidence set before writing:
    - Existing Markdown and HTML docs in the workspace.
    - Current Boomi component XML, usually under `active-development/`.
-   - Latest API inventory exports and any previous baseline inventory.
+   - Current API inventory exports and any previous baseline inventory.
    - Pull logs, sync-state files, deployment records, execution logs, and test
      results when present.
 2. Separate fact classes:
@@ -75,14 +95,18 @@ risk" without evidence.
 ## Markdown Requirements
 
 Use the main Markdown document for the complete technical briefing. Keep it
-direct and implementation-focused:
+direct, layered, and decision-ready:
 
-- Start with purpose and scope.
+- Start with purpose, audience, system boundary, and scope.
+- Include a high-level overview before component details. State what the
+  integration does, the business or operational context it supports, which
+  system roles it connects, what is proven current, and what remains open.
 - Name the evidence basis and exclusions.
 - Include a current baseline with key component versions and inventory counts.
-- Explain the end-to-end flow in runtime order.
-- Use tables for component baselines, inventory counts, risks, validation
-  status, and next steps.
+- Explain the end-to-end flow in runtime order, with enough context for a
+  stakeholder to understand why each major stage exists.
+- Use tables for component baselines, inventory counts, decision-quality risks,
+  validation status, and next steps.
 - Use numbered lists for process flows and verification sequences.
 - Use code formatting for component names, paths, properties, operations, table
   names, and exact errors.
@@ -100,6 +124,8 @@ Create a portable HTML companion only after the Markdown facts are stable:
 - Include a hero section with project name, purpose, evidence date, and status.
 - Include status cards for versions, inventory counts, risks, confirmations, or
   verification outcomes.
+- Summarize the same layered story as the Markdown: purpose, system roles,
+  runtime flow, status, risks, and next checks.
 - Use inline SVG diagrams for real system behavior: process flow, routing,
   external interactions, response handling, or error paths.
 - Use tables for baselines, risks, and next steps.

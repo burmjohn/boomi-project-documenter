@@ -10,9 +10,14 @@ Use $boomi-project-documenter to create or refresh Markdown and standalone
 visual HTML documentation for the Boomi project in [workspace path].
 
 Requirements:
-- Read existing docs, current Boomi component XML, and the latest inventory
-  export before writing.
-- Compare the latest inventory with the prior baseline when both are available.
+- Read existing docs, current Boomi component XML, and the current inventory
+  export with its exact path and export date before writing.
+- Follow the canonical Documentation Levels taxonomy and missing-evidence
+  fallback rule from `SKILL.md`.
+- Explain the integration purpose, connected system roles, current status, and
+  open decisions before listing component details, only as supported by current
+  evidence.
+- Compare the current inventory with the prior baseline when both are available.
 - Preserve exact component names, IDs, versions, folder paths, modified dates,
   operation names, profile names, and property names.
 - Separate current facts from historical notes, unsupported inferences, and
@@ -62,8 +67,8 @@ Completed the Boomi documentation refresh.
 
 Updated:
 
-- `[main documentation].md` - refreshed scope, baseline, runtime flow, risks,
-  and next steps.
+- `[main documentation].md` - refreshed executive summary, operational runtime
+  narrative, implementation baseline, system boundary, risks, and next steps.
 - `docs/[focused topic].md` - added focused troubleshooting or dependency
   details.
 - `[visual guide].html` - created a standalone visual guide with embedded CSS,
@@ -132,8 +137,9 @@ Completed the Boomi documentation refresh for `Sample Order Status Hub`.
 
 Updated:
 
-- `sample-order-status-documentation.md` - added scope, evidence basis,
-  component baseline, process flow, risk summary, and next steps.
+- `sample-order-status-documentation.md` - added executive summary, operational
+  process flow, implementation baseline, system boundary, risk summary, and next
+  steps.
 - `docs/sample-order-status-validation.md` - added the focused verification
   notes for component XML, inventory comparison, and HTML checks.
 - `sample-order-status-visual.html` - created a standalone visual guide with

@@ -164,13 +164,15 @@ published with Git tags such as `v1.0.1`.
 Use $boomi-project-documenter to create Markdown and standalone visual HTML
 documentation for the Boomi project in this workspace.
 
-Read the existing docs, current component XML, latest API inventory, prior
-baseline inventory, deployment evidence, execution logs, and test results before
-writing. Preserve exact component IDs, names, versions, folder paths, modified
-dates, operation names, profile names, map names, and properties. Clearly
-separate current facts from historical notes, unsupported inferences, and open
-risks. Do not claim runtime activity, deployment status, production readiness,
-or zero dependency without direct evidence.
+Read the existing docs, current component XML, current API inventory with its
+exact path and export date, prior baseline inventory, deployment evidence,
+execution logs, and test results before writing. Preserve exact component IDs,
+names, versions, folder paths, modified dates, operation names, profile names,
+map names, and properties. Clearly separate current facts from historical notes,
+unsupported inferences, and open risks. Do not claim runtime activity,
+deployment status, production readiness, or zero dependency without direct
+evidence. Follow `SKILL.md` for Documentation Levels and missing-evidence
+fallback wording.
 ```
 
 ## Validation
