@@ -8,7 +8,7 @@ description: >-
   produce technical Markdown, supporting docs, standalone visual HTML guides,
   evidence notes, stale-claim scans, or completion reports for Boomi projects.
 metadata:
-  version: 1.0.1
+  version: 1.0.2
 ---
 
 # Boomi Project Documenter

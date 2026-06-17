@@ -9,7 +9,7 @@ Markdown and standalone visual HTML guides.
 Use this skill when you need documentation that is accurate enough for technical
 review and clear enough for stakeholders who don't read raw Boomi XML.
 
-Current version: `1.0.1`
+Current version: `1.0.2`
 
 ## Relationship to Boomi Companion
 
@@ -156,7 +156,7 @@ This project uses Semantic Versioning:
   their invocation or generated-document expectations.
 
 The current release number is stored in `VERSION`, mirrored in `SKILL.md`, and
-published with Git tags such as `v1.0.1`.
+published with Git tags such as `v1.0.2`.
 
 ## Example prompt
 
