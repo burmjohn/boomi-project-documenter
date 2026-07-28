@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from pathlib import Path
 
 from scripts import boomi_visual_contract as contract
@@ -61,6 +62,40 @@ class RendererTests(unittest.TestCase):
         self.assertIn('id="order-routing-receive"', svg)
         self.assertIn('id="order-routing-receive-route"', svg)
         self.assertNotIn('id="receive"', svg)
+
+    def test_routing_branches_share_depth_without_crossing_sibling_nodes(self) -> None:
+        diagram = contract.load_manifest(MANIFEST)["diagrams"][0]
+
+        root = ET.fromstring(renderer.render_diagram(diagram))
+        namespace = {"svg": "http://www.w3.org/2000/svg"}
+
+        def rect_for(group_id: str) -> ET.Element:
+            group = root.find(f".//svg:g[@id='{group_id}']", namespace)
+            self.assertIsNotNone(group)
+            rect = group.find("svg:rect", namespace)  # type: ignore[union-attr]
+            self.assertIsNotNone(rect)
+            return rect  # type: ignore[return-value]
+
+        deliver = rect_for("order-routing-deliver")
+        review = rect_for("order-routing-review")
+        route = rect_for("order-routing-route")
+        invalid_group = root.find(
+            ".//svg:g[@id='order-routing-route-review']", namespace
+        )
+        self.assertIsNotNone(invalid_group)
+        invalid_line = invalid_group.find("svg:line", namespace)  # type: ignore[union-attr]
+        self.assertIsNotNone(invalid_line)
+
+        self.assertEqual(deliver.get("x"), review.get("x"))
+        self.assertNotEqual(deliver.get("y"), review.get("y"))
+        route_center_x = float(route.get("x", "0")) + float(route.get("width", "0")) / 2
+        review_center_x = (
+            float(review.get("x", "0")) + float(review.get("width", "0")) / 2
+        )
+        review_left_x = float(review.get("x", "0"))
+        self.assertGreater(float(invalid_line.get("x1", "0")), route_center_x)
+        self.assertGreaterEqual(float(invalid_line.get("x2", "0")), review_left_x)
+        self.assertLess(float(invalid_line.get("x2", "0")), review_center_x)
 
 
 class RendererCliTests(unittest.TestCase):

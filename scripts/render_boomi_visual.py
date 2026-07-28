@@ -28,7 +28,9 @@ def _text(value: object) -> str:
 
 
 def _positions(
-    nodes: list[dict[str, Any]], orientation: str
+    nodes: list[dict[str, Any]],
+    edges: list[dict[str, Any]],
+    orientation: str,
 ) -> tuple[int, int, dict[str, tuple[int, int]]]:
     if orientation == "vertical":
         height = 160 + len(nodes) * 150
@@ -41,17 +43,64 @@ def _positions(
             },
         )
 
-    columns = min(4, len(nodes))
-    rows = (len(nodes) + columns - 1) // columns
-    x_gap = (HORIZONTAL_WIDTH - 80 - columns * BOX_WIDTH) // max(columns - 1, 1)
+    node_order = {str(node["id"]): index for index, node in enumerate(nodes)}
+    indegree = {node_id: 0 for node_id in node_order}
+    outgoing: dict[str, list[str]] = {node_id: [] for node_id in node_order}
+    for edge in edges:
+        source = str(edge["from"])
+        target = str(edge["to"])
+        outgoing[source].append(target)
+        indegree[target] += 1
+
+    depths = {node_id: 0 for node_id in node_order}
+    ready = sorted(
+        (node_id for node_id, count in indegree.items() if count == 0),
+        key=node_order.get,
+    )
+    while ready:
+        source = ready.pop(0)
+        for target in sorted(outgoing[source], key=node_order.get):
+            depths[target] = max(depths[target], depths[source] + 1)
+            indegree[target] -= 1
+            if indegree[target] == 0:
+                ready.append(target)
+                ready.sort(key=node_order.get)
+
+    layers: dict[int, list[str]] = {}
+    for node_id in node_order:
+        layers.setdefault(depths[node_id], []).append(node_id)
+    max_depth = max(layers, default=0)
+    max_rows = max((len(layer) for layer in layers.values()), default=1)
+    height = max(HORIZONTAL_HEIGHT, 180 + max_rows * 140)
+    x_step = (
+        (HORIZONTAL_WIDTH - 80 - BOX_WIDTH) / max_depth if max_depth else 0
+    )
     positions: dict[str, tuple[int, int]] = {}
-    for index, node in enumerate(nodes):
-        row, column = divmod(index, columns)
-        x = 40 + column * (BOX_WIDTH + x_gap)
-        y = 92 + row * 140
-        positions[str(node["id"])] = (x, y)
-    height = max(HORIZONTAL_HEIGHT, 230 + rows * 140)
+    for depth, layer in sorted(layers.items()):
+        x = round(40 + depth * x_step)
+        if len(layer) == 1:
+            y_values = [(height - 80 - BOX_HEIGHT) // 2]
+        else:
+            available = height - 160
+            y_gap = (available - len(layer) * BOX_HEIGHT) / (len(layer) - 1)
+            y_values = [
+                round(60 + row * (BOX_HEIGHT + y_gap))
+                for row in range(len(layer))
+            ]
+        for node_id, y in zip(layer, y_values, strict=True):
+            positions[node_id] = (x, y)
     return HORIZONTAL_WIDTH, height, positions
+
+
+def _box_boundary_point(
+    center_x: int, center_y: int, delta_x: int, delta_y: int
+) -> tuple[int, int]:
+    if delta_x == 0 and delta_y == 0:
+        return center_x, center_y
+    x_scale = (BOX_WIDTH / 2) / abs(delta_x) if delta_x else float("inf")
+    y_scale = (BOX_HEIGHT / 2) / abs(delta_y) if delta_y else float("inf")
+    scale = min(x_scale, y_scale)
+    return round(center_x + delta_x * scale), round(center_y + delta_y * scale)
 
 
 def _edge_line(
@@ -64,8 +113,16 @@ def _edge_line(
     target_x, target_y = positions[str(edge["to"])]
     source_center = (source_x + BOX_WIDTH // 2, source_y + BOX_HEIGHT // 2)
     target_center = (target_x + BOX_WIDTH // 2, target_y + BOX_HEIGHT // 2)
-    label_x = (source_center[0] + target_center[0]) // 2
-    label_y = (source_center[1] + target_center[1]) // 2 - 8
+    delta_x = target_center[0] - source_center[0]
+    delta_y = target_center[1] - source_center[1]
+    source_anchor = _box_boundary_point(
+        source_center[0], source_center[1], delta_x, delta_y
+    )
+    target_anchor = _box_boundary_point(
+        target_center[0], target_center[1], -delta_x, -delta_y
+    )
+    label_x = (source_anchor[0] + target_anchor[0]) // 2
+    label_y = (source_anchor[1] + target_anchor[1]) // 2 - 8
     label = str(edge["label"])
     label_svg = (
         f'<text class="edge-label" x="{label_x}" y="{label_y}">{_text(label)}</text>'
@@ -74,8 +131,8 @@ def _edge_line(
     )
     return (
         f'<g id="{_text(diagram_id)}-{_text(edge["id"])}">'
-        f'<line class="edge" x1="{source_center[0]}" y1="{source_center[1]}" '
-        f'x2="{target_center[0]}" y2="{target_center[1]}" '
+        f'<line class="edge" x1="{source_anchor[0]}" y1="{source_anchor[1]}" '
+        f'x2="{target_anchor[0]}" y2="{target_anchor[1]}" '
         f'marker-end="url(#{marker_id})"/>'
         f"{label_svg}</g>"
     )
@@ -103,7 +160,9 @@ def render_diagram(diagram: dict[str, object]) -> str:
     diagram_id = str(diagram["id"])
     nodes = list(diagram["nodes"])  # type: ignore[arg-type]
     edges = list(diagram["edges"])  # type: ignore[arg-type]
-    width, height, positions = _positions(nodes, str(diagram["orientation"]))
+    width, height, positions = _positions(
+        nodes, edges, str(diagram["orientation"])
+    )
     title_id = f"{diagram_id}-title"
     desc_id = f"{diagram_id}-desc"
     marker_id = f"{diagram_id}-arrow"
