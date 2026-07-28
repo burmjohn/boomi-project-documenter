@@ -113,16 +113,27 @@ Verify:
 
 ## HTML Verification
 
-Verify:
+Verify the HTML mode and its evidence before accepting the report:
 
 - The file is standalone: embedded CSS, no external scripts, no external CSS,
-  and no external images.
+  and no linked images.
 - Navigation links resolve to existing IDs.
-- Diagrams are inline `<svg>` elements and explain real system behavior.
+- Deterministic diagrams are rendered from the visual manifest and embedded as
+  inline `<svg>` elements.
+- ImageGen diagrams were explicitly requested, derived from the canonical SVG,
+  reviewed against all five semantic categories, and bound to a passing
+  verification sidecar.
+- Embedded ImageGen PNG bytes match the sidecar digest and remain within the
+  8 MiB decoded limit.
 - Tables are readable on small screens.
 - Print CSS is present.
 - The hero and status cards match Markdown facts.
 - No decorative filler or unsupported visuals are present.
+
+Run `scripts/validate_boomi_docs.py --strict-generated` with the Markdown,
+HTML, manifest, SVG files, and ImageGen verification sidecars that belong to
+the generated report. A structural pass doesn't prove pixel semantics or
+runtime behavior.
 
 ## Completion Report Pattern
 

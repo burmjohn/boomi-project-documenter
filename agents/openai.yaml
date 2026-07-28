@@ -1,0 +1,8 @@
+interface:
+  display_name: "Boomi Project Documenter"
+  short_description: "Create evidence-backed Boomi project documentation"
+  brand_color: "#006D77"
+  default_prompt: "Use $boomi-project-documenter to document this Boomi project from current local evidence."
+
+policy:
+  allow_implicit_invocation: true
