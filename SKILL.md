@@ -1,14 +1,10 @@
 ---
 name: boomi-project-documenter
 description: >-
-  Create or refresh evidence-backed documentation for Boomi integration
-  projects. Use when an AI agent needs to inspect Boomi component XML, API
-  inventory exports, process folders, connector settings, maps, profiles,
-  cross references, deployment or execution evidence, and existing docs to
-  produce technical Markdown, supporting docs, standalone visual HTML guides,
-  evidence notes, stale-claim scans, or completion reports for Boomi projects.
-metadata:
-  version: 1.0.2
+  Use when creating or refreshing evidence-backed documentation for Boomi
+  integration projects from component XML, inventory exports, process folders,
+  connector settings, maps, profiles, cross references, deployment records,
+  execution evidence, or existing documentation.
 ---
 
 # Boomi Project Documenter
@@ -62,12 +58,37 @@ current evidence` instead of filling the gap.
    - Open risks, unresolved dependencies, and verification gaps.
 3. Generate or refresh Markdown first. Use
    `references/markdown-documentation-template.md` for the main structure.
-4. Generate standalone visual HTML after the Markdown is stable. Use
+4. Select `none`, `svg`, or `imagegen` visual mode after the Markdown facts are
+   stable. Read `references/visual-generation-guide.md`.
+5. Use `imagegen` only when the requester explicitly asks for it. Read
+   `references/imagegen-diagram-guide.md` before invoking the host runtime's
+   image-generation tool.
+6. Generate standalone visual HTML when requested. Use
    `references/visual-html-guide-template.html` for structure, navigation,
-   responsive CSS, print behavior, and diagram style.
-5. Verify before completion. Use `references/evidence-and-verification.md` and
+   responsive CSS, print behavior, and diagram placement.
+7. Verify before completion. Use `references/evidence-and-verification.md` and
    the scripts in `scripts/`.
-6. Report changed files, evidence used, verification checks, and remaining risks.
+8. Report changed files, evidence used, visual mode, verification checks, and
+   remaining risks.
+
+## Visual Mode
+
+Choose one mode from the request and available evidence:
+
+- `none`: Omit diagrams when none were requested or the evidence cannot support
+  a useful topology, relationship, decision, or state transition.
+- `svg`: Render the versioned visual manifest with
+  `scripts/render_boomi_visual.py`. Deliver the deterministic SVG and embed it
+  inline when the standalone HTML includes it.
+- `imagegen`: First render the same canonical SVG and capture it as a raster
+  blueprint. Invoke ImageGen only after explicit requester opt-in. Deliver no
+  PNG until its nodes, labels, edges, evidence states, title, and scope pass
+  semantic review and its verification sidecar passes strict validation.
+
+ImageGen output may be separate, embedded, or both. Stop after three total
+generation attempts. If none passes, omit the image and report the validation
+gap. Do not silently publish the SVG instead unless the requester authorizes
+that output.
 
 ## Fact Rules
 
@@ -126,11 +147,14 @@ Create a portable HTML companion only after the Markdown facts are stable:
   verification outcomes.
 - Summarize the same layered story as the Markdown: purpose, system roles,
   runtime flow, status, risks, and next checks.
-- Use inline SVG diagrams for real system behavior: process flow, routing,
+- Use the selected visual mode for real system behavior: process flow, routing,
   external interactions, response handling, or error paths.
+- In `svg` mode, embed the canonical SVG inline inside `.diagram-scroll`.
+- In `imagegen` mode, embed only a verified PNG data URL. Use `img-src data:`
+  only when the HTML contains that image; otherwise retain `img-src 'none'`.
 - Use tables for baselines, risks, and next steps.
 - Make the page responsive and print-friendly.
-- Avoid external scripts, external CSS, external images, stock imagery, and
+- Avoid external scripts, external CSS, linked images, stock imagery, and
   decorative filler.
 - Ensure every visual explains a real behavior or evidence-backed decision.
 
@@ -140,6 +164,12 @@ Create a portable HTML companion only after the Markdown facts are stable:
   Markdown document.
 - Read `references/visual-html-guide-template.html` before creating a
   standalone visual guide.
+- Read `references/visual-generation-guide.md` before creating any diagram,
+  manifest, SVG, or PNG.
+- Read `references/imagegen-diagram-guide.md` before invoking ImageGen or
+  accepting generated PNG output.
+- Read `references/security-and-disclosure.md` before documenting sensitive
+  environments, identifiers, endpoints, or payloads.
 - Read `references/evidence-and-verification.md` when gathering evidence,
   comparing inventories, validating claims, or writing completion reports.
 - Read `references/example-prompts-and-reports.md` when the user asks for a
@@ -149,9 +179,12 @@ Create a portable HTML companion only after the Markdown facts are stable:
 
 ## Scripts
 
-- Run `scripts/validate_boomi_docs.py --markdown <main.md> --html <guide.html>`
-  to check basic Markdown/HTML structure, standalone HTML constraints,
-  navigation anchors, and required visual elements.
+- Run `scripts/render_boomi_visual.py` to render schema-valid manifests into
+  deterministic SVG.
+- Run `scripts/capture_visual_preview.py` to rasterize a canonical SVG for the
+  ImageGen reference input.
+- Run `scripts/validate_boomi_docs.py` in legacy mode for version 1 documents or
+  with `--strict-generated` for version 2 manifests and outputs.
 
 ## Completion Report
 

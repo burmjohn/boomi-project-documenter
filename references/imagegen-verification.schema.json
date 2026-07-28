@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/burmjohn/boomi-project-documenter/imagegen-verification.schema.json",
+  "title": "Verified ImageGen diagram record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "diagram_id",
+    "manifest_sha256",
+    "svg_sha256",
+    "png_sha256",
+    "reviewed_at",
+    "reviewer",
+    "attempt_count",
+    "checks",
+    "disposition"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "diagram_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "manifest_sha256": {"$ref": "#/$defs/digest"},
+    "svg_sha256": {"$ref": "#/$defs/digest"},
+    "png_sha256": {"$ref": "#/$defs/digest"},
+    "reviewed_at": {"type": "string", "format": "date-time"},
+    "reviewer": {"type": "string", "minLength": 1},
+    "attempt_count": {"type": "integer", "minimum": 1, "maximum": 3},
+    "checks": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "nodes",
+        "labels",
+        "edges",
+        "evidence_states",
+        "title_and_scope"
+      ],
+      "properties": {
+        "nodes": {"const": true},
+        "labels": {"const": true},
+        "edges": {"const": true},
+        "evidence_states": {"const": true},
+        "title_and_scope": {"const": true}
+      }
+    },
+    "disposition": {"const": "pass"}
+  },
+  "$defs": {
+    "digest": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

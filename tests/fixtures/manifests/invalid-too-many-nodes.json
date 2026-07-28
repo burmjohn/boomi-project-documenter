@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "project-123",
+    "name": "Order Integration",
+    "evidence_date": "2026-07-28"
+  },
+  "facts": {
+    "component_versions": [],
+    "inventory_counts": {},
+    "risk_counts": {},
+    "risks": [],
+    "next_step_ids": []
+  },
+  "diagrams": [
+    {
+      "id": "oversized-flow",
+      "type": "routing",
+      "orientation": "horizontal",
+      "title": "Oversized flow",
+      "description": "This fixture must be rejected.",
+      "evidence_scope": "configuration",
+      "nodes": [
+        {"id": "n1", "label": "1", "kind": "step", "evidence_state": "configured"},
+        {"id": "n2", "label": "2", "kind": "step", "evidence_state": "configured"},
+        {"id": "n3", "label": "3", "kind": "step", "evidence_state": "configured"},
+        {"id": "n4", "label": "4", "kind": "step", "evidence_state": "configured"},
+        {"id": "n5", "label": "5", "kind": "step", "evidence_state": "configured"},
+        {"id": "n6", "label": "6", "kind": "step", "evidence_state": "configured"},
+        {"id": "n7", "label": "7", "kind": "step", "evidence_state": "configured"},
+        {"id": "n8", "label": "8", "kind": "step", "evidence_state": "configured"},
+        {"id": "n9", "label": "9", "kind": "step", "evidence_state": "configured"},
+        {"id": "n10", "label": "10", "kind": "step", "evidence_state": "configured"}
+      ],
+      "edges": []
+    }
+  ]
+}

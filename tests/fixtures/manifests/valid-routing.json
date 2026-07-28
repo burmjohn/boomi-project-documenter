@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "project": {
+    "id": "project-123",
+    "name": "Order Integration",
+    "evidence_date": "2026-07-28"
+  },
+  "facts": {
+    "component_versions": [
+      {
+        "id": "process-1",
+        "name": "Receive Orders",
+        "version": 4
+      }
+    ],
+    "inventory_counts": {
+      "processes": 1
+    },
+    "risk_counts": {
+      "open": 1
+    },
+    "risks": [
+      {
+        "id": "risk-1",
+        "status": "open"
+      }
+    ],
+    "next_step_ids": [
+      "verify-runtime"
+    ]
+  },
+  "diagrams": [
+    {
+      "id": "order-routing",
+      "type": "routing",
+      "orientation": "horizontal",
+      "title": "Order routing",
+      "description": "Configured order receipt routes valid orders to delivery and invalid orders to review.",
+      "evidence_scope": "configuration",
+      "nodes": [
+        {
+          "id": "receive",
+          "label": "Receive order",
+          "kind": "source",
+          "evidence_state": "configured"
+        },
+        {
+          "id": "route",
+          "label": "Validate order",
+          "kind": "decision",
+          "evidence_state": "configured"
+        },
+        {
+          "id": "deliver",
+          "label": "Deliver order",
+          "kind": "target",
+          "evidence_state": "configured"
+        },
+        {
+          "id": "review",
+          "label": "Manual review",
+          "kind": "error",
+          "evidence_state": "unverified"
+        }
+      ],
+      "edges": [
+        {
+          "id": "receive-route",
+          "from": "receive",
+          "to": "route",
+          "label": ""
+        },
+        {
+          "id": "route-deliver",
+          "from": "route",
+          "to": "deliver",
+          "label": "valid"
+        },
+        {
+          "id": "route-review",
+          "from": "route",
+          "to": "review",
+          "label": "invalid"
+        }
+      ]
+    }
+  ]
+}

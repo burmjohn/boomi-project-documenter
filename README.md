@@ -9,7 +9,7 @@ Markdown and standalone visual HTML guides.
 Use this skill when you need documentation that is accurate enough for technical
 review and clear enough for stakeholders who don't read raw Boomi XML.
 
-Current version: `1.0.2`
+Current version: `2.0.0`
 
 ## Relationship to Boomi Companion
 
@@ -27,7 +27,10 @@ The skill helps an AI agent create or refresh these artifacts:
 - A primary Markdown document that acts as the technical source of truth.
 - Focused supporting Markdown docs when a topic needs its own page.
 - A standalone visual HTML companion with embedded CSS, working navigation,
-  status cards, tables, and inline SVG diagrams.
+  status cards, tables, and a selected evidence-backed visual mode.
+- Deterministic SVG diagrams rendered from a versioned visual manifest.
+- Explicitly requested ImageGen PNG alternatives that pass semantic review and
+  digest verification before delivery.
 - Evidence notes that identify the current inventory, XML files, diff counts,
   deployment evidence, execution evidence, and verification checks used.
 - Completion reports that list changed files, remaining risks, and checks that
@@ -57,15 +60,25 @@ business-specific examples.
 boomi-project-documenter/
 ├── assets/
 │   └── sample-generated-visual-report.png
+├── agents/
+│   └── openai.yaml
 ├── SKILL.md
 ├── VERSION
 ├── references/
 │   ├── evidence-and-verification.md
 │   ├── example-prompts-and-reports.md
+│   ├── imagegen-diagram-guide.md
+│   ├── imagegen-verification.schema.json
 │   ├── markdown-documentation-template.md
 │   ├── sample-generated-visual-report.html
-│   └── visual-html-guide-template.html
+│   ├── security-and-disclosure.md
+│   ├── visual-generation-guide.md
+│   ├── visual-html-guide-template.html
+│   └── visual-manifest.schema.json
 └── scripts/
+    ├── boomi_visual_contract.py
+    ├── capture_visual_preview.py
+    ├── render_boomi_visual.py
     └── validate_boomi_docs.py
 ```
 
@@ -80,7 +93,13 @@ The `references/` directory contains reusable documentation patterns:
 - `markdown-documentation-template.md` defines the recommended structure for
   the main Boomi project document.
 - `visual-html-guide-template.html` provides a standalone, portable HTML guide
-  template with embedded CSS and inline SVG patterns.
+  template with embedded CSS and strict standalone safety patterns.
+- `visual-generation-guide.md` defines output selection, evidence states,
+  diagram types, manifests, deterministic rendering, and strict validation.
+- `imagegen-diagram-guide.md` defines the explicit opt-in ImageGen workflow,
+  semantic review, three-attempt ceiling, sidecar, and placement rules.
+- `security-and-disclosure.md` defines audience, redaction, and safe artifact
+  handling.
 - `evidence-and-verification.md` defines evidence order, XML inspection checks,
   claim classification, stale-claim scans, and completion report structure.
 - `example-prompts-and-reports.md` provides generic prompts, evidence notes,
@@ -89,11 +108,13 @@ The `references/` directory contains reusable documentation patterns:
   report with neutral Boomi component names and no organization-specific
   details.
 
-The `scripts/` directory contains validation helpers:
+The `scripts/` directory contains deterministic rendering and validation
+helpers:
 
-- `validate_boomi_docs.py` checks generated Markdown and HTML for required
-  sections, standalone HTML constraints, navigation anchors, tables, inline SVG,
-  and print CSS.
+- `render_boomi_visual.py` renders a versioned manifest into accessible SVG.
+- `capture_visual_preview.py` rasterizes the canonical SVG for ImageGen input.
+- `validate_boomi_docs.py` retains legacy checks and adds strict validation for
+  manifests, SVG, standalone HTML, and reviewed ImageGen PNG output.
 
 ## Installation
 
@@ -155,8 +176,10 @@ This project uses Semantic Versioning:
   file layout, or validator behavior in a way that may require users to update
   their invocation or generated-document expectations.
 
-The current release number is stored in `VERSION`, mirrored in `SKILL.md`, and
-published with Git tags such as `v1.0.2`.
+The current release number is stored in `VERSION`, documented in this README
+and `CHANGELOG.md`, and published with Git tags such as `v2.0.0`. `SKILL.md`
+uses version-neutral frontmatter so compatible runtimes can load it without
+product-specific metadata.
 
 ## Example prompt
 
@@ -197,6 +220,20 @@ python3 scripts/validate_boomi_docs.py \
   --html references/sample-generated-visual-report.html
 ```
 
+Run strict validation for a generated version 2 report:
+
+```bash
+python3 scripts/validate_boomi_docs.py \
+  --strict-generated \
+  --markdown path/to/main-documentation.md \
+  --html path/to/visual-guide.html \
+  --manifest path/to/visual-manifest.json \
+  --svg path/to/diagram.svg
+```
+
+Add `--imagegen-verification path/to/diagram.imagegen-verification.json` when
+the requester selected ImageGen mode.
+
 Run the validator against generated documentation:
 
 ```bash
@@ -229,7 +266,8 @@ Before publishing changes, run these checks:
 2. Run the bundled HTML validator on the visual reference template.
 3. Search the repository for organization names, process names, table names,
    internal endpoints, and internal paths.
-4. Confirm `VERSION`, `SKILL.md`, and the Git tag use the same release number.
+4. Confirm `VERSION`, this README, `CHANGELOG.md`, and the Git tag use the same
+   release number.
 5. Run `git diff --check`.
 
 ## Contributing

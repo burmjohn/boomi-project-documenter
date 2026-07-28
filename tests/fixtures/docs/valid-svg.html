@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; media-src 'none'; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+  <title>Configured flow</title>
+  <style>
+    :focus-visible { outline: 3px solid #087f8c; }
+    .diagram-scroll { overflow-x: auto; }
+    .diagram-scroll svg { min-width: 720px; }
+    .diagram-scroll text { font-size: 14px; }
+    @media print { .diagram-scroll, table { break-inside: avoid; } }
+  </style>
+</head>
+<body>
+  <nav aria-label="Report"><a href="#flow">Flow</a></nav>
+  <main id="flow">
+    <h1>Configured flow</h1>
+    <div class="diagram-scroll">
+      <svg viewBox="0 0 960 300" role="img" aria-labelledby="flow-title flow-desc">
+        <title id="flow-title">Configured flow</title>
+        <desc id="flow-desc">A configured source connects to a target.</desc>
+        <rect x="40" y="80" width="160" height="70"></rect>
+        <line x1="200" y1="115" x2="400" y2="115"></line>
+        <text x="60" y="120">Source</text>
+      </svg>
+    </div>
+    <table>
+      <caption>Flow evidence</caption>
+      <thead><tr><th scope="col">Element</th><th scope="col">State</th></tr></thead>
+      <tbody><tr><th scope="row">Connection</th><td>Configured</td></tr></tbody>
+    </table>
+  </main>
+</body>
+</html>

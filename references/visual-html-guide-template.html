@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src 'none'; font-src 'none'; media-src 'none'; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
   <title>[Project Name] Boomi visual guide</title>
   <style>
     :root {
@@ -20,6 +21,7 @@
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
+    :focus-visible { outline: 3px solid #fbbf24; outline-offset: 3px; }
     body {
       margin: 0;
       background: var(--page);
@@ -71,6 +73,10 @@
     th { background: #e9f2f4; color: #102a32; }
     tr:nth-child(even) td { background: #fafbfd; }
     .diagram { width: 100%; height: auto; margin: 18px 0 24px; border: 1px solid var(--line); border-radius: 8px; background: #fbfdff; }
+    .diagram-scroll { overflow-x: auto; }
+    .diagram-scroll .diagram { min-width: 720px; }
+    .diagram-scroll text { font-size: 14px; }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
     @media (max-width: 900px) {
       .layout { display: block; }
       aside { position: static; height: auto; }
@@ -88,6 +94,7 @@
       .content, .status { box-shadow: none; }
       .content { border: 0; padding: 0; }
       a { color: inherit; }
+      .diagram-scroll, table { break-inside: avoid; }
     }
   </style>
 </head>
@@ -126,12 +133,13 @@
         <p>Summarize the current inventory and the most important component versions. Keep counts tied to a named evidence file.</p>
         <div class="table-wrap">
           <table>
+            <caption>Current component baseline</caption>
             <thead>
               <tr>
-                <th>Component</th>
-                <th>Type</th>
-                <th>Version</th>
-                <th>Evidence</th>
+                <th scope="col">Component</th>
+                <th scope="col">Type</th>
+                <th scope="col">Version</th>
+                <th scope="col">Evidence</th>
               </tr>
             </thead>
             <tbody>
@@ -147,7 +155,8 @@
 
         <h2 id="flow">End-to-End Flow</h2>
         <p>Use a diagram only for real runtime behavior proven by process wiring.</p>
-        <svg class="diagram" viewBox="0 0 900 210" role="img" aria-labelledby="flow-title flow-desc">
+        <div class="diagram-scroll">
+          <svg class="diagram" viewBox="0 0 900 210" role="img" aria-labelledby="flow-title flow-desc">
           <title id="flow-title">End-to-end Boomi flow</title>
           <desc id="flow-desc">A generic source to transform to route to deliver to response handling flow.</desc>
           <defs>
@@ -180,7 +189,8 @@
             <line x1="500" y1="105" x2="536" y2="105"></line>
             <line x1="670" y1="105" x2="706" y2="105"></line>
           </g>
-        </svg>
+          </svg>
+        </div>
 
         <h2 id="routing">Routing Model</h2>
         <p>Explain route keys, decision properties, cross-reference lookups, or branching rules only when current process wiring proves them.</p>
@@ -191,12 +201,13 @@
         <h2 id="risks">Risks and Verification Status</h2>
         <div class="table-wrap">
           <table>
+            <caption>Risks and required verification</caption>
             <thead>
               <tr>
-                <th>Area</th>
-                <th>Status</th>
-                <th>Evidence</th>
-                <th>Next check</th>
+                <th scope="col">Area</th>
+                <th scope="col">Status</th>
+                <th scope="col">Evidence</th>
+                <th scope="col">Next check</th>
               </tr>
             </thead>
             <tbody>
