@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "diagram_id": "order-routing",
+  "manifest_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "svg_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "png_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+  "reviewed_at": "2026-07-28T12:00:00Z",
+  "reviewer": "codex:test-runtime",
+  "attempt_count": 1,
+  "checks": {
+    "nodes": true,
+    "labels": true,
+    "edges": true,
+    "evidence_states": true,
+    "title_and_scope": true
+  },
+  "disposition": "pass"
+}
