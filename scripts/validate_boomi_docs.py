@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import base64
 import binascii
+import json
 import re
 import sys
 import xml.etree.ElementTree as ET
@@ -96,12 +97,14 @@ class HtmlFacts(HTMLParser):
         self.event_handlers: list[str] = []
         self.unsafe_urls: list[tuple[str, str, str]] = []
         self.images: list[dict[str, str | None]] = []
+        self.fact_payloads: list[str] = []
         self.tables: list[TableFacts] = []
         self.svgs: list[SvgFacts] = []
         self._tag_stack: list[tuple[str, set[str]]] = []
         self._table_stack: list[TableFacts] = []
         self._svg_stack: list[SvgFacts] = []
         self._style_depth = 0
+        self._fact_chunks: list[str] | None = None
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         tag = tag.lower()
@@ -136,6 +139,8 @@ class HtmlFacts(HTMLParser):
             self.forbidden_tags.append(tag)
         if tag == "img":
             self.images.append(attrs_dict)
+        if tag == "template" and attrs_dict.get("id") == "boomi-doc-facts":
+            self._fact_chunks = []
         if tag == "meta" and (attrs_dict.get("http-equiv") or "").lower() == (
             "content-security-policy"
         ):
@@ -179,6 +184,8 @@ class HtmlFacts(HTMLParser):
     def handle_data(self, data: str) -> None:
         if self._style_depth:
             self.style_text.append(data)
+        if self._fact_chunks is not None:
+            self._fact_chunks.append(data)
 
     def handle_endtag(self, tag: str) -> None:
         tag = tag.lower()
@@ -188,6 +195,9 @@ class HtmlFacts(HTMLParser):
             self._table_stack.pop()
         if tag == "svg" and self._svg_stack:
             self._svg_stack.pop()
+        if tag == "template" and self._fact_chunks is not None:
+            self.fact_payloads.append("".join(self._fact_chunks).strip())
+            self._fact_chunks = None
         for index in range(len(self._tag_stack) - 1, -1, -1):
             if self._tag_stack[index][0] == tag:
                 del self._tag_stack[index:]
@@ -514,6 +524,97 @@ def validate_svg(path: Path, text: str, errors: list[str]) -> None:
         fail(errors, f"{path}: SVG must contain visual elements")
 
 
+def _markdown_fact_payloads(text: str) -> list[str]:
+    return [
+        match.group(1).strip()
+        for match in re.finditer(
+            r"<!--\s*boomi-doc-facts\s*(\{.*?\})\s*-->",
+            text,
+            re.DOTALL,
+        )
+    ]
+
+
+def _validate_fact_payload(
+    source: str,
+    payload_text: str,
+    expected_facts: object,
+    errors: list[str],
+) -> None:
+    try:
+        payload = json.loads(payload_text)
+    except json.JSONDecodeError as exc:
+        fail(errors, f"{source} fact payload is invalid JSON: {exc.msg}")
+        return
+    if not isinstance(payload, dict) or set(payload) != {"sha256", "facts"}:
+        fail(errors, f"{source} fact payload requires only sha256 and facts")
+        return
+    facts = payload["facts"]
+    actual_digest = sha256_bytes(canonical_json(facts))
+    if payload["sha256"] != actual_digest:
+        fail(errors, f"{source} fact digest is invalid")
+    if canonical_json(facts) != canonical_json(expected_facts):
+        fail(errors, f"{source} facts do not match the manifest")
+
+
+def validate_manifest_parity(
+    manifests: list[dict[str, object]],
+    markdown_paths: list[Path],
+    html_facts: list[tuple[Path, HtmlFacts]],
+    svg_paths: list[Path],
+    errors: list[str],
+) -> None:
+    if len(markdown_paths) != 1:
+        fail(errors, "strict manifest validation requires exactly one Markdown file")
+        return
+    if len(html_facts) > 1:
+        fail(errors, "strict manifest validation allows at most one HTML file")
+        return
+    expected_facts = manifests[0]["facts"]
+    for manifest in manifests[1:]:
+        if canonical_json(manifest["facts"]) != canonical_json(expected_facts):
+            fail(errors, "all manifests must contain identical canonical facts")
+            return
+
+    markdown_payloads = _markdown_fact_payloads(read_text(markdown_paths[0]))
+    if len(markdown_payloads) != 1:
+        fail(
+            errors,
+            f"{markdown_paths[0]}: expected exactly one boomi-doc-facts comment",
+        )
+    else:
+        _validate_fact_payload(
+            "Markdown", markdown_payloads[0], expected_facts, errors
+        )
+
+    if html_facts:
+        html_path, facts = html_facts[0]
+        if len(facts.fact_payloads) != 1:
+            fail(
+                errors,
+                f"{html_path}: expected exactly one boomi-doc-facts template",
+            )
+        else:
+            _validate_fact_payload(
+                "HTML", facts.fact_payloads[0], expected_facts, errors
+            )
+
+    declared_ids = {
+        str(diagram["id"])
+        for manifest in manifests
+        for diagram in manifest["diagrams"]  # type: ignore[index]
+    }
+    supplied_ids = {path.stem for path in svg_paths}
+    if supplied_ids != declared_ids or len(svg_paths) != len(declared_ids):
+        missing = ", ".join(sorted(declared_ids - supplied_ids)) or "none"
+        extra = ", ".join(sorted(supplied_ids - declared_ids)) or "none"
+        fail(
+            errors,
+            "strict manifest validation requires exactly one SVG per diagram "
+            f"(missing: {missing}; extra: {extra})",
+        )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -612,6 +713,14 @@ def main(argv: list[str] | None = None) -> int:
             manifest_paths,
             svg_paths,
             parsed_html,
+            errors,
+        )
+    if manifests:
+        validate_manifest_parity(
+            manifests,
+            markdown_paths,
+            parsed_html,
+            svg_paths,
             errors,
         )
 

@@ -15,6 +15,8 @@ VALIDATOR = ROOT / "scripts" / "validate_boomi_docs.py"
 DOCS = ROOT / "tests" / "fixtures" / "docs"
 MANIFEST = ROOT / "tests" / "fixtures" / "manifests" / "valid-routing.json"
 SVG = ROOT / "tests" / "fixtures" / "rendered" / "order-routing.svg"
+VALID_MARKDOWN = DOCS / "valid.md"
+VALID_FACTS_HTML = DOCS / "valid-facts.html"
 PNG_BYTES = base64.b64decode(
     "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk"
     "+A8AAQUBAScY42YAAAAASUVORK5CYII="
@@ -115,6 +117,77 @@ class StrictCliTests(unittest.TestCase):
         self.assertEqual(result.returncode, 2)
         self.assertIn("not allowed with argument", result.stderr)
 
+    def test_manifest_requires_exactly_one_markdown_file(self) -> None:
+        result = run_validator(
+            "--strict-generated",
+            "--manifest",
+            MANIFEST,
+            "--svg",
+            SVG,
+        )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("exactly one Markdown file", result.stderr)
+
+
+class FactParityTests(unittest.TestCase):
+    def test_manifest_markdown_and_html_facts_match(self) -> None:
+        result = run_validator(
+            "--strict-generated",
+            "--manifest",
+            MANIFEST,
+            "--markdown",
+            VALID_MARKDOWN,
+            "--html",
+            VALID_FACTS_HTML,
+            "--svg",
+            SVG,
+        )
+
+        self.assertEqual(result.returncode, 0, result.stderr)
+
+    def test_html_fact_change_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            invalid_html = Path(temporary) / "invalid-facts.html"
+            invalid_html.write_text(
+                VALID_FACTS_HTML.read_text(encoding="utf-8").replace(
+                    '"risk_counts":{"open":1}', '"risk_counts":{"open":2}'
+                ),
+                encoding="utf-8",
+            )
+
+            result = run_validator(
+                "--strict-generated",
+                "--manifest",
+                MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
+                "--html",
+                invalid_html,
+                "--svg",
+                SVG,
+            )
+
+        self.assertEqual(result.returncode, 1)
+        self.assertIn("HTML fact digest is invalid", result.stderr)
+
+
+class RepositoryReleaseTests(unittest.TestCase):
+    def test_release_version_is_aligned(self) -> None:
+        version = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
+
+        self.assertEqual(version, "2.0.0")
+        self.assertIn(
+            "Current version: `2.0.0`",
+            (ROOT / "README.md").read_text(encoding="utf-8"),
+        )
+        changelog = ROOT / "CHANGELOG.md"
+        self.assertTrue(changelog.is_file())
+        self.assertIn(
+            "## 2.0.0 - 2026-07-28",
+            changelog.read_text(encoding="utf-8"),
+        )
+
 
 class ImageGenValidationTests(unittest.TestCase):
     def build_case(
@@ -154,18 +227,24 @@ class ImageGenValidationTests(unittest.TestCase):
         }
         sidecar_path = directory / "order-routing.imagegen-verification.json"
         sidecar_path.write_text(json.dumps(sidecar), encoding="utf-8")
-        if not embedded:
-            return sidecar_path, None
-
         encoded = base64.b64encode(PNG_BYTES).decode("ascii")
+        image = (
+            f'<img data-diagram-id="order-routing" '
+            f'alt="Verified order routing diagram" '
+            f'src="data:image/png;base64,{encoded}">'
+            if embedded
+            else ""
+        )
+        image_csp = "data:" if embedded else "'none'"
         html = f"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none'; media-src 'none'; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src {image_csp}; font-src 'none'; media-src 'none'; connect-src 'none'; frame-src 'none'; form-action 'none'; base-uri 'none'; object-src 'none'">
 <title>Verified ImageGen flow</title>
 <style>:focus-visible{{outline:2px solid}}@media print{{table{{break-inside:avoid}}}}</style>
 </head><body><nav><a href="#main">Main</a></nav><main id="main">
 <h1>Verified ImageGen flow</h1>
-<img data-diagram-id="order-routing" alt="Verified order routing diagram" src="data:image/png;base64,{encoded}">
+<template id="boomi-doc-facts">{{"sha256":"63c0425c1a26ab687e4ac7ed332e96a58bf1f56c19ed6020bbba62744aea8d29","facts":{{"component_versions":[{{"id":"process-1","name":"Receive Orders","version":4}}],"inventory_counts":{{"processes":1}},"next_step_ids":["verify-runtime"],"risk_counts":{{"open":1}},"risks":[{{"id":"risk-1","status":"open"}}]}}}}</template>
+{image}
 <table><caption>Evidence</caption><tr><th scope="col">Area</th></tr><tr><td>Flow</td></tr></table>
 </main></body></html>"""
         html_path = directory / "verified-imagegen.html"
@@ -181,6 +260,8 @@ class ImageGenValidationTests(unittest.TestCase):
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--html",
@@ -200,6 +281,8 @@ class ImageGenValidationTests(unittest.TestCase):
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--imagegen-verification",
@@ -211,16 +294,18 @@ class ImageGenValidationTests(unittest.TestCase):
     def test_separate_png_keeps_no_image_csp_in_companion_html(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             directory = Path(temporary)
-            sidecar, _ = self.build_case(directory, embedded=False)
+            sidecar, html = self.build_case(directory, embedded=False)
 
             result = run_validator(
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--html",
-                DOCS / "valid-no-diagram.html",
+                html,
                 "--imagegen-verification",
                 sidecar,
             )
@@ -238,6 +323,8 @@ class ImageGenValidationTests(unittest.TestCase):
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--html",
@@ -260,6 +347,8 @@ class ImageGenValidationTests(unittest.TestCase):
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--imagegen-verification",
@@ -279,6 +368,8 @@ class ImageGenValidationTests(unittest.TestCase):
                 "--strict-generated",
                 "--manifest",
                 MANIFEST,
+                "--markdown",
+                VALID_MARKDOWN,
                 "--svg",
                 SVG,
                 "--imagegen-verification",

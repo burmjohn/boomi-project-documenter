@@ -9,7 +9,7 @@ Markdown and standalone visual HTML guides.
 Use this skill when you need documentation that is accurate enough for technical
 review and clear enough for stakeholders who don't read raw Boomi XML.
 
-Current version: `1.0.2`
+Current version: `2.0.0`
 
 ## Relationship to Boomi Companion
 
@@ -176,8 +176,10 @@ This project uses Semantic Versioning:
   file layout, or validator behavior in a way that may require users to update
   their invocation or generated-document expectations.
 
-The current release number is stored in `VERSION`, mirrored in `SKILL.md`, and
-published with Git tags such as `v1.0.2`.
+The current release number is stored in `VERSION`, documented in this README
+and `CHANGELOG.md`, and published with Git tags such as `v2.0.0`. `SKILL.md`
+uses version-neutral frontmatter so compatible runtimes can load it without
+product-specific metadata.
 
 ## Example prompt
 
@@ -264,7 +266,8 @@ Before publishing changes, run these checks:
 2. Run the bundled HTML validator on the visual reference template.
 3. Search the repository for organization names, process names, table names,
    internal endpoints, and internal paths.
-4. Confirm `VERSION`, `SKILL.md`, and the Git tag use the same release number.
+4. Confirm `VERSION`, this README, `CHANGELOG.md`, and the Git tag use the same
+   release number.
 5. Run `git diff --check`.
 
 ## Contributing
